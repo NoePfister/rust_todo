@@ -32,6 +32,7 @@ fn main() {
             "q" => app.quit(),
             "s" => app.show(),
             "n" => app.new_todo(),
+            "d" => app.delete_todo(),
             _ => {
                 println!("Invalid command");
                 continue 'command;
@@ -49,7 +50,7 @@ impl App {
     fn new() -> App {
         App {
             todos: Vec::new(),
-            save_path: "/rust_todo.txt".to_string(),
+            save_path: String::from("/rust_todo.txt"),
         }
     }
 
@@ -104,6 +105,37 @@ impl App {
         }
 
         fs::write(&self.save_path,save_string).expect("Couldn't write to file!")
+    }
+
+    fn delete_todo(&mut self){
+        App::clear();
+        println!("Please input the Number, you would like to delete!");
+
+        for (i,todo) in self.todos.iter().enumerate() {
+            let j = 1+i;
+            println!("{j}. {}", todo);
+        }
+
+        let mut input = String::new();
+        match io::stdin().read_line(&mut input) {
+            Ok(_) => (),
+            Err(_) => {
+                println!("Couldn't read command line!");
+            }
+        }
+
+        let index: usize = match input.trim().parse(){
+            Ok(i) => i,
+            Err(_) => {
+                println!("Please input a number!");
+                println!("Press Enter to continue!");
+                App::wait_for_input();
+                return;
+            },
+        };
+
+        self.todos.remove(index-1);
+
     }
 
     fn clear() {
